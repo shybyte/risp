@@ -131,4 +131,5 @@ fn test_list() {
     assert_eq!(parse("()"), Ok(List(vec![])));
     assert_eq!(parse("(42)"), Ok(List(vec![Int(42)])));
     assert_eq!(parse("(42 23)"), Ok(List(vec![Int(42), Int(23)])));
+    assert_eq!(parse("(42 (23))"), Ok(List(vec![Int(42), List(vec![Int(23)])])));
 }
