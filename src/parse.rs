@@ -1,6 +1,6 @@
 use regex::Regex;
-use types::MistType;
-use types::MistType::*;
+use types::RispType;
+use types::RispType::*;
 //use std::iter::Peekable;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -61,7 +61,7 @@ impl Iterator for Tokenizer {
 }
 
 
-fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<MistType, String> {
+fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<RispType, String> {
     let mut tokenizer = tokenizer.peekable();
     if let Some(token) = tokenizer.next() {
         return match token {
@@ -103,7 +103,7 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
     Err("Error".to_string())
 }
 
-pub fn parse(input: &str) -> Result<MistType, String> {
+pub fn parse(input: &str) -> Result<RispType, String> {
     let mut tokenizer = Tokenizer::new(input);
     return parse_internal(&mut tokenizer);
 }

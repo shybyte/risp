@@ -1,8 +1,8 @@
-use types::MistType;
-use types::MistType::*;
+use types::RispType;
+use types::RispType::*;
 
 
-fn sum(list: Vec<MistType>) -> Result<MistType, String> {
+fn sum(list: Vec<RispType>) -> Result<RispType, String> {
     let mut s = 0;
     for x in list {
         match x {
@@ -13,7 +13,7 @@ fn sum(list: Vec<MistType>) -> Result<MistType, String> {
     Ok(Int(s))
 }
 
-pub fn eval(ast: MistType) -> Result<MistType, String> {
+pub fn eval(ast: RispType) -> Result<RispType, String> {
     match ast {
         List(args) => {
             let function = args.first().ok_or("Empty List")?;
