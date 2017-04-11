@@ -1,6 +1,7 @@
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MistType {
     Int(i64),
-    List(Vec<MistType>)
+    List(Vec<MistType>),
+    Symbol(String)
 }

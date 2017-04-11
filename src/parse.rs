@@ -3,11 +3,12 @@ use types::MistType;
 use types::MistType::*;
 //use std::iter::Peekable;
 
-#[derive(Debug, PartialEq,Copy,Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum TokenType {
     Number,
     ListStart,
-    ListEnd
+    ListEnd,
+    Symbol
 }
 
 struct Tokenizer {
@@ -26,6 +27,8 @@ impl Iterator for Tokenizer {
 
     fn next(&mut self) -> Option<(TokenType, String)> {
         let input = &self.input[self.pos..];
+
+        // Skip white space
         let input_trimmed = input.trim_left();
         self.pos += input.len() - input_trimmed.len();
         let input = input_trimmed;
@@ -45,6 +48,14 @@ impl Iterator for Tokenizer {
             self.pos += cap[0].len();
             return Some((TokenType::Number, cap[0].to_string()))
         }
+
+        let symbol_regexp = Regex::new(r"^\S+").unwrap();
+        if let Some(cap) = symbol_regexp.captures(input) {
+            self.pos += cap[0].len();
+            return Some((TokenType::Symbol, cap[0].to_string()))
+        }
+
+
         None
     }
 }
@@ -56,6 +67,10 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
         return match token {
             (TokenType::Number, token_string) => {
                 Ok(Int(token_string.parse().unwrap()))
+            },
+
+            (TokenType::Symbol, token_string) => {
+                Ok(Symbol(token_string))
             }
 
             (TokenType::ListStart, _token_string) => {
@@ -127,9 +142,26 @@ fn test_tokenizer() {
 }
 
 #[test]
+fn test_tokenizer_symbol() {
+    assert_eq!(tokenize("symbol"), vec![(TokenType::Symbol, "symbol".to_string())]);
+    assert_eq!(tokenize("(+ 42)"), vec![
+        (TokenType::ListStart, "(".to_string()),
+        (TokenType::Symbol, "+".to_string()),
+        (TokenType::Number, "42".to_string()),
+        (TokenType::ListEnd, ")".to_string())
+    ]);
+}
+
+#[test]
 fn test_list() {
     assert_eq!(parse("()"), Ok(List(vec![])));
     assert_eq!(parse("(42)"), Ok(List(vec![Int(42)])));
     assert_eq!(parse("(42 23)"), Ok(List(vec![Int(42), Int(23)])));
     assert_eq!(parse("(42 (23))"), Ok(List(vec![Int(42), List(vec![Int(23)])])));
+}
+
+#[test]
+fn test_parse_symbols() {
+    assert_eq!(parse("symbol"), Ok(Symbol("symbol".to_string())));
+    assert_eq!(parse("(+ 1 2)"), Ok(List(vec![Symbol("+".to_string()), Int(1), Int(2)])));
 }
