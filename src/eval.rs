@@ -10,9 +10,9 @@ pub fn eval(ast: RispType, env: &Environment) -> RispResult {
             let evaluated_list = list.iter()
                 .map(|el| eval(el.clone(), env))
                 .collect::<Result<Vec<_>, _>>()?;
-            let first_element = evaluated_list.first().ok_or(error("Empty List"))?;
-            match first_element {
-                &Symbol(ref symbol) => {
+            let first_element = evaluated_list.first().ok_or_else(|| error("Empty List"))?;
+            match *first_element {
+                Symbol(ref symbol) => {
                     let env_value = env.get(symbol);
                     match env_value {
                         Function(function) => function(evaluated_list[1..].to_vec()),
@@ -27,6 +27,7 @@ pub fn eval(ast: RispType, env: &Environment) -> RispResult {
 }
 
 
+#[allow(dead_code)]
 fn eval_test(ast: RispType) -> RispResult {
     eval(ast, &create_core_environment())
 }

@@ -105,7 +105,7 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
 
 pub fn parse(input: &str) -> Result<RispType, String> {
     let mut tokenizer = Tokenizer::new(input);
-    return parse_internal(&mut tokenizer);
+    parse_internal(&mut tokenizer)
 }
 
 
@@ -117,6 +117,7 @@ fn test_parse_number() {
     assert_eq!(parse("-42"), Ok(Int(-42)));
 }
 
+#[allow(dead_code)]
 fn tokenize(input: &str) -> Vec<(TokenType, String)> {
     Tokenizer::new(input).collect()
 }
