@@ -1,5 +1,7 @@
 extern crate regex;
 
+mod core;
+mod environment;
 mod eval;
 mod parse;
 mod types;

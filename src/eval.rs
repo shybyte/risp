@@ -1,28 +1,25 @@
-use types::RispType;
+use types::*;
 use types::RispType::*;
+use environment::*;
+use core::create_core_environment;
 
 
-fn sum(list: Vec<RispType>) -> Result<RispType, String> {
-    let mut s = 0;
-    for x in list {
-        match x {
-            Int(x2) => { s += x2 }
-            _ => return Err("I want ints!".to_string())
-        }
-    }
-    Ok(Int(s))
-}
-
-pub fn eval(ast: RispType) -> Result<RispType, String> {
+pub fn eval(ast: RispType, env: &Environment) -> RispResult {
     match ast {
-        List(args) => {
-            let function = args.first().ok_or("Empty List")?;
-            match function {
-                &Symbol(ref symbol) => match &symbol[..] {
-                    "+" => sum(args[1..].to_vec()),
-                    _ => Err("Unknown function".to_string())
-                },
-                _ => Err("Expected function".to_string())
+        List(list) => {
+            let evaluated_list = list.iter()
+                .map(|el| eval(el.clone(), env))
+                .collect::<Result<Vec<_>, _>>()?;
+            let first_element = evaluated_list.first().ok_or(error("Empty List"))?;
+            match first_element {
+                &Symbol(ref symbol) => {
+                    let env_value = env.get(symbol);
+                    match env_value {
+                        Function(function) => function(evaluated_list[1..].to_vec()),
+                        _ => error_result(format!("Expected function but got {:?}", env_value))
+                    }
+                }
+                _ => error_result(format!("Expected symbol but got {:?}", first_element))
             }
         }
         other => Ok(other)
@@ -30,12 +27,32 @@ pub fn eval(ast: RispType) -> Result<RispType, String> {
 }
 
 
-#[test]
-fn eval_numers() {
-    assert_eq!(eval(Int(23)), Ok(Int(23)));
+fn eval_test(ast: RispType) -> RispResult {
+    eval(ast, &create_core_environment())
 }
 
 #[test]
-fn eval_math() {
-    assert_eq!(eval(List(vec![Symbol("+".to_string()), Int(1), Int(2)])), Ok(Int(3)));
+fn test_eval_number() {
+    assert_eq!(eval_test(Int(23)), Ok(Int(23)));
+}
+
+#[test]
+fn test_eval_math() {
+    assert_eq!(eval_test(List(vec![Symbol("+".to_string()), Int(1), Int(2)])), Ok(Int(3)));
+}
+
+#[test]
+fn test_nested_math() {
+    assert_eq!(eval_test(List(vec![
+        Symbol("+".to_string()), Int(1),
+        List(vec![Symbol("+".to_string()), Int(10), Int(100)])
+    ])), Ok(Int(111)));
+}
+
+#[test]
+fn test_mul() {
+    assert_eq!(eval_test(List(vec![
+        Symbol("+".to_string()), Int(1),
+        List(vec![Symbol("*".to_string()), Int(10), Int(23)])
+    ])), Ok(Int(231)));
 }
