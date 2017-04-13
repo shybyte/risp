@@ -14,8 +14,8 @@ impl Environment {
         self.data.insert(key.to_string(), value);
     }
 
-    pub fn get(&self, key: &str) -> RispType {
-        self.data[key].clone()
+    pub fn get(&self, key: &str) -> Option<RispType> {
+        self.data.get(key).map(|v| v.clone())
     }
 }
 

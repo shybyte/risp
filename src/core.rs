@@ -31,3 +31,18 @@ pub fn create_core_environment() -> Environment {
     env.insert("*", Function(mul));
     env
 }
+
+
+
+
+/* Tests */
+
+#[test]
+fn test_sum_errors() {
+    assert!(sum(vec![List(vec![])]).is_err());
+}
+
+#[test]
+fn test_mul_errors() {
+    assert!(mul(vec![List(vec![])]).is_err());
+}

@@ -13,7 +13,7 @@ pub fn eval(ast: RispType, env: &Environment) -> RispResult {
             let first_element = evaluated_list.first().ok_or_else(|| error("Empty List"))?;
             match *first_element {
                 Symbol(ref symbol) => {
-                    let env_value = env.get(symbol);
+                    let env_value = env.get(symbol).ok_or_else(|| error(format!("Undefined symbol{:?}", symbol)))?;
                     match env_value {
                         Function(function) => function(evaluated_list[1..].to_vec()),
                         _ => error_result(format!("Expected function but got {:?}", env_value))
