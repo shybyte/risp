@@ -1,7 +1,6 @@
 use regex::Regex;
-use types::RispType;
+use types::*;
 use types::RispType::*;
-//use std::iter::Peekable;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum TokenType {
@@ -61,7 +60,7 @@ impl Iterator for Tokenizer {
 }
 
 
-fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<RispType, String> {
+fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<RispType, RispError> {
     let mut tokenizer = tokenizer.peekable();
     if let Some(token) = tokenizer.next() {
         return match token {
@@ -88,22 +87,22 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
                             }
                         }
                     } else {
-                        return Err("Unexpected end of input".to_string());
+                        return error_result("Unexpected end of input");
                     }
                 }
                 Ok(List(list))
             }
 
             (TokenType::ListEnd, token_string) => {
-                Err("Unexpected end of list".to_string() + &token_string[..])
+                error_result("Unexpected end of list".to_string() + &token_string[..])
             }
         }
     }
 
-    Err("Error".to_string())
+    error_result("Error")
 }
 
-pub fn parse(input: &str) -> Result<RispType, String> {
+pub fn parse(input: &str) -> Result<RispType, RispError> {
     let mut tokenizer = Tokenizer::new(input);
     parse_internal(&mut tokenizer)
 }
