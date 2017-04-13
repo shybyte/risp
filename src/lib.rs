@@ -12,6 +12,6 @@ use eval::eval;
 use core::create_core_environment;
 
 pub fn eval_risp(risp_code: &str) -> RispResult {
-    let ast = parse(&risp_code)?;
+    let ast = parse(risp_code)?;
     eval(ast, &create_core_environment())
 }

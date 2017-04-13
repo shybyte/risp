@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 use types::*;
 
+#[derive(Default)]
 pub struct Environment {
     data: HashMap<String, RispType>,
 }
 
 impl Environment {
-    pub fn new() -> Environment {
+    pub fn new() -> Self {
         Environment { data: HashMap::new() }
     }
 
@@ -15,7 +16,7 @@ impl Environment {
     }
 
     pub fn get(&self, key: &str) -> Option<RispType> {
-        self.data.get(key).map(|v| v.clone())
+        self.data.get(key).cloned()
     }
 }
 
