@@ -19,7 +19,7 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                             match *var {
                                 Symbol(ref sym_var) => {
                                     let value = evaluated_list.get(2).ok_or_else(|| error("Missing value in def"))?;
-                                    env.insert(sym_var, value.clone());
+                                    env.set(sym_var, value.clone());
                                     Ok(value.clone())
                                 }
                                 _ => error_result(format!("Expected symbol in def but got {:?}", var))

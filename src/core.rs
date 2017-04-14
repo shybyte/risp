@@ -27,8 +27,8 @@ fn mul(list: Vec<RispType>) -> RispResult {
 
 pub fn create_core_environment() -> Environment {
     let mut env = Environment::new();
-    env.insert("+", Function(sum));
-    env.insert("*", Function(mul));
+    env.set("+", Function(sum));
+    env.set("*", Function(mul));
     env
 }
 

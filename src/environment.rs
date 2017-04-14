@@ -11,7 +11,7 @@ impl Environment {
         Environment { data: HashMap::new() }
     }
 
-    pub fn insert(&mut self, key: &str, value: RispType) {
+    pub fn set(&mut self, key: &str, value: RispType) {
         self.data.insert(key.to_string(), value);
     }
 
