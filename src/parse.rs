@@ -69,7 +69,7 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
             },
 
             (TokenType::Symbol, token_string) => {
-                Ok(Symbol(token_string))
+                Ok(symbol(token_string))
             }
 
             (TokenType::ListStart, _token_string) => {

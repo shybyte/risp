@@ -20,3 +20,7 @@ pub fn error<S: Into<String>>(message: S) -> RispError {
 pub fn error_result<S: Into<String>>(message: S) -> RispResult {
     Err(error(message))
 }
+
+pub fn symbol<S: Into<String>>(s: S) ->  RispType {
+    RispType::Symbol(s.into())
+}

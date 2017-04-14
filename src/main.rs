@@ -21,7 +21,7 @@ fn main() {
 
     let ast = parse(&contents).unwrap();
     println!("{:?}", ast);
-    let result = eval(ast, &create_core_environment());
+    let result = eval(ast, &mut create_core_environment());
     println!("{:?}", result);
 
 }
