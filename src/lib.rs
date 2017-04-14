@@ -14,7 +14,6 @@ use core::create_core_environment;
 
 pub fn eval_risp(risp_code: &str) -> RispResult {
     eval_risp_for_env(risp_code, &mut create_core_environment())
-
 }
 
 pub fn eval_risp_for_env(risp_code: &str, env: &mut Environment) -> RispResult {

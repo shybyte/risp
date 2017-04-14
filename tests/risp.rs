@@ -43,3 +43,10 @@ fn test_eval_errors() {
     assert!(eval_risp("(def a)").is_err());
     assert!(eval_risp("(def 1 2)").is_err());
 }
+
+#[test]
+fn test_eval_error_expected_function() {
+    let mut env = create_core_environment();
+    env.set("var", Int(1));
+    assert!(eval_risp("(var 1 2 3)").is_err());
+}
