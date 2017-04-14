@@ -2,6 +2,7 @@ extern crate risp;
 
 use risp::*;
 use risp::types::RispType::*;
+use risp::types::error_result;
 use risp::core::create_core_environment;
 
 #[test]
@@ -48,5 +49,6 @@ fn test_eval_errors() {
 fn test_eval_error_expected_function() {
     let mut env = create_core_environment();
     env.set("var", Int(1));
-    assert!(eval_risp("(var 1 2 3)").is_err());
+    let result = eval_risp_for_env("(var 1 2 3)", &mut env);
+    assert_eq!(result, error_result("Expected function but got Int(1)"));
 }
