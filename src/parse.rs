@@ -111,8 +111,8 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
                 Ok(List(list))
             }
 
-            (TokenType::ListEnd, token_string) => {
-                error_result("Unexpected end of list".to_string() + &token_string[..])
+            (TokenType::ListEnd, _token_string) => {
+                error_result("Unexpected end of list")
             }
 
             (TokenType::VectorStart, _token_string) => {
@@ -130,14 +130,14 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
                             }
                         }
                     } else {
-                        return error_result("Unexpected end of vector");
+                        return error_result("Vector should end with ] but just ends");
                     }
                 }
                 Ok(Vector(vector))
             }
 
-            (TokenType::VectorEnd, token_string) => {
-                error_result("Unexpected end of vector".to_string() + &token_string[..])
+            (TokenType::VectorEnd, _token_string) => {
+                error_result("Unexpected ]")
             }
         }
     }
@@ -229,4 +229,11 @@ fn test_parse_vector() {
     assert_eq!(parse("[42]"), Ok(Vector(vec![Int(42)])));
     assert_eq!(parse("[42 23]"), Ok(Vector(vec![Int(42), Int(23)])));
     assert_eq!(parse("[42 [23]]"), Ok(Vector(vec![Int(42), Vector(vec![Int(23)])])));
+}
+
+#[test]
+fn test_parse_vector_errors() {
+    assert_eq!(parse("["), error_result("Vector should end with ] but just ends"));
+    assert_eq!(parse("]"), error_result("Unexpected ]"));
+    assert_eq!(parse("(]"), error_result("Unexpected ]"));
 }
