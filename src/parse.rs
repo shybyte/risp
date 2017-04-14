@@ -7,8 +7,12 @@ enum TokenType {
     Number,
     ListStart,
     ListEnd,
+    VectorStart,
+    VectorEnd,
     Symbol
 }
+
+type Token = (TokenType, String);
 
 struct Tokenizer {
     input: String,
@@ -22,9 +26,9 @@ impl Tokenizer {
 }
 
 impl Iterator for Tokenizer {
-    type Item = (TokenType, String);
+    type Item = Token;
 
-    fn next(&mut self) -> Option<(TokenType, String)> {
+    fn next(&mut self) -> Option<Token> {
         let input = &self.input[self.pos..];
 
         // Skip white space
@@ -34,18 +38,28 @@ impl Iterator for Tokenizer {
 
         if input.starts_with('(') {
             self.pos += 1;
-            return Some((TokenType::ListStart, '('.to_string()))
+            return Some(token(TokenType::ListStart, "("))
         }
 
         if input.starts_with(')') {
             self.pos += 1;
-            return Some((TokenType::ListEnd, ')'.to_string()))
+            return Some(token(TokenType::ListEnd, ")"))
+        }
+
+        if input.starts_with('[') {
+            self.pos += 1;
+            return Some(token(TokenType::VectorStart, "["))
+        }
+
+        if input.starts_with(']') {
+            self.pos += 1;
+            return Some(token(TokenType::VectorEnd, "]"));
         }
 
         let number_regexp = Regex::new(r"^-?\d+").unwrap();
         if let Some(cap) = number_regexp.captures(input) {
             self.pos += cap[0].len();
-            return Some((TokenType::Number, cap[0].to_string()))
+            return Some(token(TokenType::Number, cap[0].to_string()))
         }
 
         let symbol_regexp = Regex::new(r"^\S+").unwrap();
@@ -59,14 +73,18 @@ impl Iterator for Tokenizer {
     }
 }
 
+fn token<S: Into<String>>(token_type: TokenType, s: S) -> Token {
+    (token_type, s.into())
+}
 
-fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<RispType, RispError> {
+
+fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, RispError> {
     let mut tokenizer = tokenizer.peekable();
     if let Some(token) = tokenizer.next() {
         return match token {
             (TokenType::Number, token_string) => {
                 Ok(Int(token_string.parse().unwrap()))
-            },
+            }
 
             (TokenType::Symbol, token_string) => {
                 Ok(symbol(token_string))
@@ -87,7 +105,7 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
                             }
                         }
                     } else {
-                        return error_result("Unexpected end of input");
+                        return error_result("Unexpected end of list");
                     }
                 }
                 Ok(List(list))
@@ -95,6 +113,31 @@ fn parse_internal(tokenizer: &mut Iterator<Item=(TokenType, String)>) -> Result<
 
             (TokenType::ListEnd, token_string) => {
                 error_result("Unexpected end of list".to_string() + &token_string[..])
+            }
+
+            (TokenType::VectorStart, _token_string) => {
+                let mut vector = vec![];
+                loop {
+                    let token_option = tokenizer.peek().cloned();
+                    if let Some(element_token) = token_option {
+                        match element_token {
+                            (TokenType::VectorEnd, _) => {
+                                break;
+                            }
+                            _ => {
+                                let parsed_element = parse_internal(&mut tokenizer)?;
+                                vector.push(parsed_element);
+                            }
+                        }
+                    } else {
+                        return error_result("Unexpected end of vector");
+                    }
+                }
+                Ok(Vector(vector))
+            }
+
+            (TokenType::VectorEnd, token_string) => {
+                error_result("Unexpected end of vector".to_string() + &token_string[..])
             }
         }
     }
@@ -117,7 +160,7 @@ fn test_parse_number() {
 }
 
 #[allow(dead_code)]
-fn tokenize(input: &str) -> Vec<(TokenType, String)> {
+fn tokenize(input: &str) -> Vec<Token> {
     Tokenizer::new(input).collect()
 }
 
@@ -153,6 +196,20 @@ fn test_tokenizer_symbol() {
 }
 
 #[test]
+fn test_tokenizer_vector() {
+    assert_eq!(tokenize("[]"), vec![
+        token(TokenType::VectorStart, "["),
+        token(TokenType::VectorEnd, "]")
+    ]);
+    assert_eq!(tokenize("[23 42]"), vec![
+        token(TokenType::VectorStart, "["),
+        token(TokenType::Number, "23"),
+        token(TokenType::Number, "42"),
+        token(TokenType::VectorEnd, "]")
+    ]);
+}
+
+#[test]
 fn test_list() {
     assert_eq!(parse("()"), Ok(List(vec![])));
     assert_eq!(parse("(42)"), Ok(List(vec![Int(42)])));
@@ -164,4 +221,12 @@ fn test_list() {
 fn test_parse_symbols() {
     assert_eq!(parse("symbol"), Ok(Symbol("symbol".to_string())));
     assert_eq!(parse("(+ 1 2)"), Ok(List(vec![Symbol("+".to_string()), Int(1), Int(2)])));
+}
+
+#[test]
+fn test_parse_vector() {
+    assert_eq!(parse("[]"), Ok(Vector(vec![])));
+    assert_eq!(parse("[42]"), Ok(Vector(vec![Int(42)])));
+    assert_eq!(parse("[42 23]"), Ok(Vector(vec![Int(42), Int(23)])));
+    assert_eq!(parse("[42 [23]]"), Ok(Vector(vec![Int(42), Vector(vec![Int(23)])])));
 }

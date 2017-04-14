@@ -7,28 +7,29 @@ use core::create_core_environment;
 pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
     match ast {
         List(list) => {
-            let evaluated_list = list.iter()
-                .map(|el| eval(el.clone(), env))
-                .collect::<Result<Vec<_>, _>>()?;
-            let first_element = evaluated_list.first().ok_or_else(|| error("Empty List"))?;
+            let first_element = list.first().ok_or_else(|| error("Empty List"))?;
             match *first_element {
                 Symbol(ref symbol) => {
                     match symbol.as_ref() {
                         "def" => {
-                            let var = evaluated_list.get(1).ok_or_else(|| error("Missing variable in def"))?;
+                            let var = list.get(1).ok_or_else(|| error("Missing variable in def"))?;
                             match *var {
                                 Symbol(ref sym_var) => {
-                                    let value = evaluated_list.get(2).ok_or_else(|| error("Missing value in def"))?;
+                                    let value_ast = list.get(2).ok_or_else(|| error("Missing value in def"))?;
+                                    let value = eval(value_ast.clone(), env)?;
                                     env.set(sym_var, value.clone());
-                                    Ok(value.clone())
+                                    Ok(value)
                                 }
                                 _ => error_result(format!("Expected symbol in def but got {:?}", var))
                             }
                         }
                         _ => {
+                            let evaluated_tail = list[1..].iter()
+                                .map(|el| eval(el.clone(), env))
+                                .collect::<Result<Vec<_>, _>>()?;
                             let env_value = env.get(symbol).ok_or_else(|| error(format!("Undefined symbol{:?}", symbol)))?;
                             match env_value {
-                                Function(function) => function(evaluated_list[1..].to_vec()),
+                                Function(function) => function(evaluated_tail.to_vec()),
                                 _ => error_result(format!("Expected function but got {:?}", env_value))
                             }
                         }
@@ -36,6 +37,15 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                 }
                 _ => error_result(format!("Expected symbol but got {:?}", first_element))
             }
+        },
+        Vector(vector) => {
+            let evaluated_vector = vector.iter()
+                .map(|el| eval(el.clone(), env))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(Vector(evaluated_vector))
+        }
+        Symbol(symbol) => {
+            env.get(&symbol).ok_or_else(|| error(format!("symbol '{:?}' is undefined", symbol)))
         }
         other => Ok(other)
     }
@@ -101,4 +111,16 @@ fn test_def_evaluated() {
     ]), &mut env), Ok(Int(3)));
 
     assert_eq!(env.get(variable), Some(Int(3)));
+}
+
+#[test]
+fn test_eval_simple_vector() {
+    let simple_vector = Vector(vec![Int(1), Int(2)]);
+    assert_eq!(eval_test(simple_vector.clone()), Ok(simple_vector));
+}
+
+#[test]
+fn test_eval_nested_vector() {
+    let simple_vector = Vector(vec![Int(1), List(vec![symbol("+"), Int(1), Int(2)])]);
+    assert_eq!(eval_test(simple_vector.clone()), Ok(Vector(vec![Int(1), Int(3)])));
 }

@@ -8,6 +8,7 @@ pub type RispResult = Result<RispType, RispError>;
 pub enum RispType {
     Int(i64),
     List(Vec<RispType>),
+    Vector(Vec<RispType>),
     Symbol(String),
     Function(fn(Vec<RispType>) -> RispResult),
 }

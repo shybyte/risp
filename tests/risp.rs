@@ -52,3 +52,11 @@ fn test_eval_error_expected_function() {
     let result = eval_risp_for_env("(var 1 2 3)", &mut env);
     assert_eq!(result, error_result("Expected function but got Int(1)"));
 }
+
+#[test]
+fn test_eval_vector() {
+    let mut env = create_core_environment();
+    env.set("var", Int(1));
+    let result = eval_risp_for_env("[var 2 (+ 3 4)]", &mut env);
+    assert_eq!(result, Ok(Vector(vec![Int(1), Int(2), Int(7)])));
+}
