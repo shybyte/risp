@@ -29,8 +29,11 @@ A rusty lisp inspired by Clojure
   
   (def myVector [1 myInt 3])
   
+  (def repeated (rep 2 1 2 3))
+  
   {:added       (+ myInt 20)
    :multiplied  (* myInt 20)
+   :repeated    repeated
    :myVector    myVector
    :myMap       {:key myInt}
    :myString    "Hello"
