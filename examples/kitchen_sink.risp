@@ -1,0 +1,11 @@
+(def myInt 2)
+
+(def myVector [1 myInt 3])
+
+{:added       (+ myInt 20 myInt)
+ :muplitplied (* myInt 20 myInt)
+ :myVector    myVector
+ :myMap       {:key myInt}
+ :myDoResult  (do
+                (def myInt2 20)
+                (+ myInt myInt2))}

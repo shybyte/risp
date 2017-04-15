@@ -15,15 +15,12 @@ use core::create_core_environment;
 
 
 fn main() {
-    let mut file = File::open("examples/simple.risp").unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    //let wrapped_content = "(".to_string() + &contents + ")";
+    let mut file = File::open("examples/kitchen_sink.risp").unwrap();
+    let mut risp_code = String::new();
+    file.read_to_string(&mut risp_code).unwrap();
 
-    let ast = parse(&contents).unwrap();
-    println!("{:?}", ast);
+    let ast = parse(&("(do ".to_string() + &risp_code + ")")).unwrap();
     let result = eval(ast, &mut create_core_environment());
     println!("{:?}", result);
-
 }
 

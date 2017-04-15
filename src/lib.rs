@@ -21,3 +21,8 @@ pub fn eval_risp_for_env(risp_code: &str, env: &mut Environment) -> RispResult {
     let ast = parse(risp_code)?;
     eval(ast, env)
 }
+
+pub fn eval_risp_script(risp_code: &str, env: &mut Environment) -> RispResult {
+    let ast = parse(&("(do ".to_string() + risp_code + ")"))?;
+    eval(ast, env)
+}
