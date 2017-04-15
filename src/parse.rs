@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use types::*;
 use types::RispType::*;
 use tokenize::*;
@@ -12,6 +13,10 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
 
             (TokenType::Symbol, token_string) => {
                 Ok(symbol(token_string))
+            }
+
+            (TokenType::Keyword, token_string) => {
+                Ok(keyword(&token_string[1..]))
             }
 
             (TokenType::ListStart, _token_string) => {
@@ -62,6 +67,37 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
 
             (TokenType::VectorEnd, _token_string) => {
                 error_result("Unexpected ]")
+            }
+
+            (TokenType::HashMapStart, _token_string) => {
+                let mut map = HashMap::<String, RispType>::new();
+                loop {
+                    let token_option = tokenizer.peek().cloned();
+                    if let Some(element_token) = token_option {
+                        match element_token {
+                            (TokenType::HashMapEnd, _) => {
+                                break;
+                            }
+
+                            (TokenType::Keyword, keyword) => {
+                                tokenizer.next();
+                                let parsed_element = parse_internal(&mut tokenizer)?;
+                                map.insert((&keyword[1..]).to_string(), parsed_element);
+                            }
+
+                            (_, token_string) => {
+                                return error_result(format!("Expected keyword but got {:?}", token_string));
+                            }
+                        }
+                    } else {
+                        return error_result("HashMap should end with } but just ends");
+                    }
+                }
+                Ok(HashMap(map))
+            }
+
+            (TokenType::HashMapEnd, _token_string) => {
+                error_result("Unexpected }")
             }
         }
     }
@@ -116,3 +152,34 @@ fn test_parse_vector_errors() {
     assert_eq!(parse("]"), error_result("Unexpected ]"));
     assert_eq!(parse("(]"), error_result("Unexpected ]"));
 }
+
+
+#[test]
+fn test_hash_map_empty() {
+    assert_eq!(parse("{}"), Ok(HashMap(HashMap::new())));
+}
+
+#[test]
+fn test_hash_map_with_1_key() {
+    let expected_pairs : Vec<(String, RispType)> = vec![("key".to_string(), Int(123))];
+    let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
+    assert_eq!(parse("{:key 123}"), Ok(HashMap(expected_map)));
+}
+
+#[test]
+fn test_hash_map_with_2_keys() {
+    let expected_pairs : Vec<(String, RispType)> = vec![
+        ("key1".to_string(), Int(1)),
+        ("key2".to_string(), Int(2))
+    ];
+    let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
+    assert_eq!(parse("{:key1 1 :key2 2}"), Ok(HashMap(expected_map)));
+}
+
+#[test]
+fn test_hash_map_errors() {
+    assert_eq!(parse("{"), error_result("HashMap should end with } but just ends"));
+    assert_eq!(parse("}"), error_result("Unexpected }"));
+    assert_eq!(parse("{123}"), error_result("Expected keyword but got \"123\""));
+}
+
