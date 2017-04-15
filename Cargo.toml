@@ -1,7 +1,7 @@
 [package]
 name = "risp"
-version = "0.2.0"
-description = "A rusty Lisp inspired by Clojure for usage as simple configuraton language"
+version = "0.2.1"
+description = "A rusty Lisp inspired by Clojure for usage as simple configuration language"
 repository = "https://github.com/shybyte/risp"
 license = "MIT"
 authors = ["shybyte@gmail.com"]
