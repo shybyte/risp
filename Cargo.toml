@@ -1,7 +1,10 @@
 [package]
 name = "risp"
 version = "0.1.0"
-authors = ["shybyte <ein@volloeko.de>"]
+description = "A rusty Lisp inspired by Clojure for usage as simple configuraton language"
+repository = "https://github.com/shybyte/risp"
+license = "MIT"
+authors = ["shybyte@gmail.com"]
 
 [dependencies]
 regex = "0.2"
