@@ -78,7 +78,7 @@ impl Iterator for Tokenizer {
         if let Some(cap) = symbol_regexp.captures(input) {
             self.pos += cap[0].len();
             let cap_string = cap[0].to_string();
-            if cap_string.starts_with(":") {
+            if cap_string.starts_with(':') {
                 return Some((TokenType::Keyword, cap_string))
             } else {
                 return Some((TokenType::Symbol, cap_string))
