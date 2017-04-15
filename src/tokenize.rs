@@ -74,7 +74,7 @@ impl Iterator for Tokenizer {
             return Some(token(TokenType::Number, cap[0].to_string()))
         }
 
-        let symbol_regexp = Regex::new(r"^\S+").unwrap();
+        let symbol_regexp = Regex::new(r"^[^\s\{\}()\[\]]+").unwrap();
         if let Some(cap) = symbol_regexp.captures(input) {
             self.pos += cap[0].len();
             let cap_string = cap[0].to_string();
@@ -148,7 +148,7 @@ fn test_tokenizer_vector() {
 }
 
 #[test]
-fn test_empty_hashmap() {
+fn test_empty_map() {
     assert_eq!(tokenize("{}"), vec![
         token(TokenType::HashMapStart, "{"),
         token(TokenType::HashMapEnd, "}")
@@ -156,11 +156,39 @@ fn test_empty_hashmap() {
 }
 
 #[test]
-fn test_hashmap() {
+fn test_map() {
     assert_eq!(tokenize("{:keyword 123}"), vec![
         token(TokenType::HashMapStart, "{"),
         token(TokenType::Keyword, ":keyword"),
         token(TokenType::Number, "123"),
         token(TokenType::HashMapEnd, "}")
+    ]);
+}
+
+#[test]
+fn test_map_ending_with_symbol_as_value() {
+    assert_eq!(tokenize("{:keyword var}"), vec![
+        token(TokenType::HashMapStart, "{"),
+        token(TokenType::Keyword, ":keyword"),
+        token(TokenType::Symbol, "var"),
+        token(TokenType::HashMapEnd, "}")
+    ]);
+}
+
+#[test]
+fn test_list_ending_with_symbol() {
+    assert_eq!(tokenize("(symbol)"), vec![
+        token(TokenType::ListStart, "("),
+        token(TokenType::Symbol, "symbol"),
+        token(TokenType::ListEnd, ")")
+    ]);
+}
+
+#[test]
+fn test_vector_ending_with_symbol() {
+    assert_eq!(tokenize("[symbol]"), vec![
+        token(TokenType::VectorStart, "["),
+        token(TokenType::Symbol, "symbol"),
+        token(TokenType::VectorEnd, "]")
     ]);
 }

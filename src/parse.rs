@@ -180,6 +180,15 @@ fn test_hash_map_with_2_keys() {
 }
 
 #[test]
+fn test_map_with_var() {
+    assert_eq!(parse("{:key1 var}"), Ok(map(vec![
+        ("key1", symbol("var"))
+    ])));
+}
+
+
+
+#[test]
 fn test_hash_map_errors() {
     assert_eq!(parse("{"), error_result("HashMap should end with } but just ends"));
     assert_eq!(parse("}"), error_result("Unexpected }"));
