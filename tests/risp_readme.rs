@@ -26,7 +26,7 @@ fn test_kitchen_sink() {
         (def myVector [1 myInt 3])
 
         {:added       (+ myInt 20 myInt)
-         :multiplied (* myInt 20 myInt)
+         :multiplied  (* myInt 20 myInt)
          :myVector    myVector
          :myMap       {:key myInt}
          :myDoResult  (do
