@@ -155,6 +155,12 @@ fn test_parse_vector_errors() {
 
 
 #[test]
+fn test_keyword() {
+    assert_eq!(parse(":key"), Ok(keyword("key")));
+}
+
+
+#[test]
 fn test_hash_map_empty() {
     assert_eq!(parse("{}"), Ok(Map(HashMap::new())));
 }
