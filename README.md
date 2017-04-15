@@ -29,10 +29,11 @@ A rusty lisp inspired by Clojure
   
   (def myVector [1 myInt 3])
   
-  {:added       (+ myInt 20 myInt)
-   :multiplied  (* myInt 20 myInt)
+  {:added       (+ myInt 20)
+   :multiplied  (* myInt 20)
    :myVector    myVector
    :myMap       {:key myInt}
+   :myString    "Hello"
    :myDoResult  (do
                   (def myInt2 20)
                   (+ myInt myInt2))}

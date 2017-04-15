@@ -10,6 +10,7 @@ pub type RispResult = Result<RispType, RispError>;
 #[derive(Debug, PartialEq, Clone)]
 pub enum RispType {
     Int(i64),
+    Str(String),
     List(Vec<RispType>),
     Vector(Vec<RispType>),
     Map(HashMap<String, RispType>),
@@ -35,6 +36,9 @@ pub fn keyword<S: Into<String>>(s: S) -> RispType {
     RispType::Keyword(s.into())
 }
 
+pub fn string<S: Into<String>>(s: S) -> RispType {
+    RispType::Str(s.into())
+}
 
 #[allow(dead_code)]
 pub fn map<S: Into<String>>(pairs: Vec<(S, RispType)>) -> RispType {

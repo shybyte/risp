@@ -20,19 +20,20 @@ fn test_minimal_example() {
 fn test_kitchen_sink() {
     let mut env = create_core_environment();
 
-    let risp_script = r"
+    let risp_script = r##"
         (def myInt 2)
 
         (def myVector [1 myInt 3])
 
-        {:added       (+ myInt 20 myInt)
-         :multiplied  (* myInt 20 myInt)
+        {:added       (+ myInt 20)
+         :multiplied  (* myInt 20)
          :myVector    myVector
          :myMap       {:key myInt}
+         :myString    "Hello"
          :myDoResult  (do
                         (def myInt2 20)
                         (+ myInt myInt2))}
-    ";
+    "##;
     let result = eval_risp_script(risp_script, &mut env);
     assert!(result.is_ok());
 }

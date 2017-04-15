@@ -19,6 +19,10 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
                 Ok(keyword(&token_string[1..]))
             }
 
+            (TokenType::Str, token_string) => {
+                Ok(string(&token_string[1..(token_string.len() - 1)]))
+            }
+
             (TokenType::ListStart, _token_string) => {
                 let mut list = vec![];
                 loop {
@@ -111,7 +115,6 @@ pub fn parse(input: &str) -> Result<RispType, RispError> {
 }
 
 
-
 /* ------------------------------ Tests ----------------------------------------------- */
 
 #[test]
@@ -121,7 +124,6 @@ fn test_parse_number() {
     assert_eq!(parse("42"), Ok(Int(42)));
     assert_eq!(parse("-42"), Ok(Int(-42)));
 }
-
 
 
 #[test]
@@ -187,7 +189,6 @@ fn test_map_with_var() {
 }
 
 
-
 #[test]
 fn test_hash_map_errors() {
     assert_eq!(parse("{"), error_result("HashMap should end with } but just ends"));
@@ -195,3 +196,7 @@ fn test_hash_map_errors() {
     assert_eq!(parse("{123}"), error_result("Expected keyword but got \"123\""));
 }
 
+#[test]
+fn test_str() {
+    assert_eq!(parse("\"string\""), Ok(string("string")));
+}

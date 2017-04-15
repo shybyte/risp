@@ -11,7 +11,8 @@ pub enum TokenType {
     HashMapStart,
     HashMapEnd,
     Symbol,
-    Keyword
+    Keyword,
+    Str
 }
 
 pub type Token = (TokenType, String);
@@ -66,6 +67,12 @@ impl Iterator for Tokenizer {
         if input.starts_with('}') {
             self.pos += 1;
             return Some(token(TokenType::HashMapEnd, "}"));
+        }
+
+        let str_regexp = Regex::new("^\".*?\"").unwrap();
+        if let Some(cap) = str_regexp.captures(input) {
+            self.pos += cap[0].len();
+            return Some(token(TokenType::Str, cap[0].to_string()))
         }
 
         let number_regexp = Regex::new(r"^-?\d+").unwrap();
@@ -190,5 +197,13 @@ fn test_vector_ending_with_symbol() {
         token(TokenType::VectorStart, "["),
         token(TokenType::Symbol, "symbol"),
         token(TokenType::VectorEnd, "]")
+    ]);
+}
+
+#[test]
+fn test_string() {
+    assert_eq!(tokenize("\"string\" \"\""), vec![
+        token(TokenType::Str, "\"string\""),
+        token(TokenType::Str, "\"\""),
     ]);
 }
