@@ -12,7 +12,7 @@ pub enum RispType {
     Int(i64),
     List(Vec<RispType>),
     Vector(Vec<RispType>),
-    HashMap(HashMap<String, RispType>),
+    Map(HashMap<String, RispType>),
     Keyword(String),
     Symbol(String),
     Function(fn(Vec<RispType>) -> RispResult),

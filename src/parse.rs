@@ -93,7 +93,7 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
                         return error_result("HashMap should end with } but just ends");
                     }
                 }
-                Ok(HashMap(map))
+                Ok(Map(map))
             }
 
             (TokenType::HashMapEnd, _token_string) => {
@@ -156,14 +156,14 @@ fn test_parse_vector_errors() {
 
 #[test]
 fn test_hash_map_empty() {
-    assert_eq!(parse("{}"), Ok(HashMap(HashMap::new())));
+    assert_eq!(parse("{}"), Ok(Map(HashMap::new())));
 }
 
 #[test]
 fn test_hash_map_with_1_key() {
     let expected_pairs : Vec<(String, RispType)> = vec![("key".to_string(), Int(123))];
     let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
-    assert_eq!(parse("{:key 123}"), Ok(HashMap(expected_map)));
+    assert_eq!(parse("{:key 123}"), Ok(Map(expected_map)));
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn test_hash_map_with_2_keys() {
         ("key2".to_string(), Int(2))
     ];
     let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
-    assert_eq!(parse("{:key1 1 :key2 2}"), Ok(HashMap(expected_map)));
+    assert_eq!(parse("{:key1 1 :key2 2}"), Ok(Map(expected_map)));
 }
 
 #[test]
