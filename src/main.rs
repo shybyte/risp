@@ -5,6 +5,7 @@ mod environment;
 mod eval;
 mod parse;
 mod types;
+mod tokenize;
 
 use std::fs::File;
 use std::io::prelude::*;

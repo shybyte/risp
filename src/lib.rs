@@ -4,6 +4,7 @@ pub mod core;
 pub mod environment;
 pub mod eval;
 pub mod parse;
+mod tokenize;
 pub mod types;
 
 use types::RispResult;
