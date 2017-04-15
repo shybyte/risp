@@ -23,6 +23,16 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                                 }
                                 _ => error_result(format!("Expected symbol in def but got {:?}", var))
                             }
+                        },
+                        "do" => {
+                            if let Some((last, elements)) =  (&list[1..]).split_last() {
+                                for child_ast in elements.iter() {
+                                    eval(child_ast.clone(), env)?;
+                                }
+                                eval(last.clone(), env)
+                            } else {
+                                error_result("Empty do block")
+                            }
                         }
                         _ => {
                             let evaluated_tail = list[1..].iter()

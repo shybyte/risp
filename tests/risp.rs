@@ -72,3 +72,23 @@ fn test_eval_map() {
         ("key2", Int(5))
     ])));
 }
+
+#[test]
+fn test_eval_do() {
+    let mut env = create_core_environment();
+    let result = eval_risp_for_env(r"
+    (do
+        (def var 23)
+        {:key var}
+    )
+    ", &mut env);
+    assert_eq!(result, Ok(map(vec![
+        ("key", Int(23)),
+    ])));
+}
+
+#[test]
+fn test_eval_do_empty() {
+    let result = eval_risp("(do)");
+    assert_eq!(result, error_result("Empty do block"));
+}
