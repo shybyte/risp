@@ -3,6 +3,8 @@ extern crate risp;
 use risp::eval_risp_script;
 use risp::types::RispType::Int;
 use risp::core::create_core_environment;
+use std::fs::File;
+use std::io::prelude::*;
 
 #[test]
 fn test_minimal_example() {
@@ -18,22 +20,11 @@ fn test_minimal_example() {
 
 #[test]
 fn test_kitchen_sink() {
+    let mut file = File::open("examples/kitchen_sink.risp").unwrap();
+    let mut risp_code = String::new();
+    file.read_to_string(&mut risp_code).unwrap();
+
     let mut env = create_core_environment();
-
-    let risp_script = r##"
-        (def myInt 2)
-
-        (def myVector [1 myInt 3])
-
-        {:added       (+ myInt 20)
-         :multiplied  (* myInt 20)
-         :myVector    myVector
-         :myMap       {:key myInt}
-         :myString    "Hello"
-         :myDoResult  (do
-                        (def myInt2 20)
-                        (+ myInt myInt2))}
-    "##;
-    let result = eval_risp_script(risp_script, &mut env);
+    let result = eval_risp_script(&risp_code, &mut env);
     assert!(result.is_ok());
 }

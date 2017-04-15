@@ -1,0 +1,16 @@
+(def chorus_notes
+  (rep 6
+       (rep 4 45 57)
+       (rep 4 48 60)
+       (rep 4 43 55)
+       (rep 4 43 55)))
+
+(def wild_notes (rep 50 45 47 53 57 60 67 60 57 53 47))
+
+{:name          "Amazon"
+ :program       42
+ :time_per_note 220
+ :effects       [{:trigger 43 :noteSequencer {:notes chorus_notes}}
+                 {:trigger 45 :noteSequencer {:notes [38 50 38 50 chorus_notes] :beat_offset 4}}
+                 {:trigger 36 :noteSequencer {:notes wild_notes}}
+                 {:trigger 38 :noteSequencer {:notes []}}]}
