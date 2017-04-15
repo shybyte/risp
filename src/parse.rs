@@ -167,19 +167,16 @@ fn test_hash_map_empty() {
 
 #[test]
 fn test_hash_map_with_1_key() {
-    let expected_pairs : Vec<(String, RispType)> = vec![("key".to_string(), Int(123))];
-    let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
-    assert_eq!(parse("{:key 123}"), Ok(Map(expected_map)));
+    assert_eq!(parse("{:key 123}"), Ok(map(vec![("key", Int(123))])));
 }
 
 #[test]
 fn test_hash_map_with_2_keys() {
-    let expected_pairs : Vec<(String, RispType)> = vec![
-        ("key1".to_string(), Int(1)),
-        ("key2".to_string(), Int(2))
-    ];
-    let expected_map : HashMap<String, RispType> = expected_pairs.into_iter().collect();
-    assert_eq!(parse("{:key1 1 :key2 2}"), Ok(Map(expected_map)));
+    let expected_map = map(vec![
+        ("key1", Int(1)),
+        ("key2", Int(2))
+    ]);
+    assert_eq!(parse("{:key1 1 :key2 2}"), Ok(expected_map));
 }
 
 #[test]

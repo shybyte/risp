@@ -2,6 +2,7 @@ extern crate risp;
 
 use risp::*;
 use risp::types::RispType::*;
+use risp::types::*;
 use risp::types::error_result;
 use risp::core::create_core_environment;
 
@@ -59,4 +60,15 @@ fn test_eval_vector() {
     env.set("var", Int(1));
     let result = eval_risp_for_env("[var 2 (+ 3 4)]", &mut env);
     assert_eq!(result, Ok(Vector(vec![Int(1), Int(2), Int(7)])));
+}
+
+#[test]
+fn test_eval_map() {
+    let mut env = create_core_environment();
+    env.set("var", Int(1));
+    let result = eval_risp_for_env("{:key1 2 :key2 (+ 3 4)}", &mut env);
+    assert_eq!(result, Ok(map(vec![
+        ("key1", Int(2)),
+        ("key2", Int(7))
+    ])));
 }

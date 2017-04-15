@@ -27,10 +27,19 @@ pub fn error_result<S: Into<String>>(message: S) -> RispResult {
     Err(error(message))
 }
 
-pub fn symbol<S: Into<String>>(s: S) ->  RispType {
+pub fn symbol<S: Into<String>>(s: S) -> RispType {
     RispType::Symbol(s.into())
 }
 
-pub fn keyword<S: Into<String>>(s: S) ->  RispType {
+pub fn keyword<S: Into<String>>(s: S) -> RispType {
     RispType::Keyword(s.into())
+}
+
+
+#[allow(dead_code)]
+pub fn map<S: Into<String>>(pairs: Vec<(S, RispType)>) -> RispType {
+    let result: HashMap<String, RispType> = pairs.into_iter()
+        .map(|(s, r)| (s.into(), r))
+        .collect();
+    RispType::Map(result)
 }

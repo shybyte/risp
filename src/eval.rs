@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use types::*;
 use types::RispType::*;
 use environment::*;
@@ -37,13 +38,23 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                 }
                 _ => error_result(format!("Expected symbol but got {:?}", first_element))
             }
-        },
+        }
         Vector(vector) => {
             let evaluated_vector = vector.iter()
                 .map(|el| eval(el.clone(), env))
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(Vector(evaluated_vector))
         }
+
+        Map(map_value) => {
+            let evaluated_map = map_value.iter()
+                .map(|(key, val)|
+                    eval(val.clone(), env).map(|evaluated_value|
+                        (key.to_string(), evaluated_value)))
+                .collect::<Result<HashMap<String, RispType>, _>>()?;
+            Ok(Map(evaluated_map))
+        }
+
         Symbol(symbol) => {
             env.get(&symbol).ok_or_else(|| error(format!("symbol '{:?}' is undefined", symbol)))
         }
@@ -123,4 +134,25 @@ fn test_eval_simple_vector() {
 fn test_eval_nested_vector() {
     let simple_vector = Vector(vec![Int(1), List(vec![symbol("+"), Int(1), Int(2)])]);
     assert_eq!(eval_test(simple_vector.clone()), Ok(Vector(vec![Int(1), Int(3)])));
+}
+
+
+#[test]
+fn test_eval_simple_map() {
+    let simple_map = map(vec![
+        ("key1", Int(1)),
+        ("key2", Int(2))
+    ]);
+    assert_eq!(eval_test(simple_map.clone()), Ok(simple_map));
+}
+
+#[test]
+fn test_eval_nested_map() {
+    let input_map = map(vec![
+        ("key", List(vec![symbol("+"), Int(1), Int(2)]))
+    ]);
+    let expected_output_map = map(vec![
+        ("key", Int(3))
+    ]);
+    assert_eq!(eval_test(input_map.clone()), Ok(expected_output_map));
 }
