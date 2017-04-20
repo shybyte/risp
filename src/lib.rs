@@ -1,5 +1,7 @@
 extern crate regex;
 
+
+pub mod convert;
 pub mod core;
 pub mod environment;
 pub mod eval;
