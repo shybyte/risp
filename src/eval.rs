@@ -73,6 +73,8 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
 }
 
 
+/* ------------------------------ Tests ----------------------------------------------- */
+
 #[allow(dead_code)]
 fn eval_test(ast: RispType) -> RispResult {
     eval(ast, &mut create_core_environment())
