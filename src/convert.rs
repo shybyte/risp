@@ -41,17 +41,10 @@ impl Into<Result<Vec<RispType>, RispError>> for RispType {
     }
 }
 
-
-fn into_vec(risp_value: RispType) -> Result<Vec<RispType>, RispError> {
-    match risp_value {
-        Vector(vector) => Ok(vector),
-        _ => Err(error(format!("Expected Vector but got {:?}", risp_value)))
-    }
-}
-
 impl Into<Result<Vec<i64>, RispError>> for RispType {
     fn into(self) -> Result<Vec<i64>, RispError> {
-        into_vec(self)?.iter().cloned()
+        let vec_of_risp: Result<Vec<RispType>,_> = self.into();
+        vec_of_risp?.iter().cloned()
             .map(|el| el.into())
             .collect::<Result<Vec<i64>, _>>()
     }
@@ -120,7 +113,6 @@ fn test_convert_vector_int() {
     assert_eq!(result, Ok(vec![23]));
 }
 
-
 #[test]
 fn test_convert_map() {
     let input_map = map(vec![
@@ -133,7 +125,7 @@ fn test_convert_map() {
 #[test]
 fn test_convert_map_error() {
     let result: Result<HashMap<String, RispType>, RispError> = List(vec![]).into();
-    assert!(result.is_err());
+    assert_eq!(result, Err(error(format!("Expected Map but got List([])"))));
 }
 
 #[test]
@@ -146,10 +138,26 @@ fn test_get() {
 }
 
 #[test]
-fn test_get_error() {
+fn test_get_none() {
+    let input_map = map(vec![
+        ("key", Int(23))
+    ]);
+    let int_option: Option<i64> = input_map.get("unknown_key").unwrap();
+    assert_eq!(int_option, None);
+}
+
+#[test]
+fn test_get_error_expected_int() {
     let input_map = map(vec![
         ("key", string("string"))
     ]);
     let int_result: Result<Option<i64>, _> = input_map.get("key");
-    assert!(int_result.is_err());
+    assert_eq!(int_result, Err(error(format!("Expected Int but got {:?}", string("string")))));
+}
+
+#[test]
+fn test_get_error_expected_map() {
+    let input = Int(123);
+    let int_result: Result<Option<i64>, _> = input.get("key");
+    assert_eq!(int_result, Err(error(format!("Expected Map but got Int(123)"))));
 }
