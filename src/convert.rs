@@ -5,6 +5,13 @@ use types::*;
 use std::collections::HashMap;
 
 
+impl Into<Result<RispType, RispError>> for RispType {
+    fn into(self) -> Result<RispType, RispError> {
+        Ok(self)
+    }
+}
+
+
 impl Into<Result<i64, RispError>> for RispType {
     fn into(self) -> Result<i64, RispError> {
         match self {
@@ -43,12 +50,13 @@ impl Into<Result<Vec<RispType>, RispError>> for RispType {
 
 impl Into<Result<Vec<i64>, RispError>> for RispType {
     fn into(self) -> Result<Vec<i64>, RispError> {
-        let vec_of_risp: Result<Vec<RispType>,_> = self.into();
+        let vec_of_risp: Result<Vec<RispType>, _> = self.into();
         vec_of_risp?.iter().cloned()
             .map(|el| el.into())
             .collect::<Result<Vec<i64>, _>>()
     }
 }
+
 
 impl RispType {
     pub fn get<T>(&self, key: &str) -> Result<Option<T>, RispError> where RispType: Into<Result<T, RispError>> {
@@ -64,6 +72,34 @@ impl RispType {
             _ => Err(error(format!("Expected Map but got {:?}", self)))
         }
     }
+}
+
+
+pub fn flatten_into<T>(risp_vec_input: RispType) -> Result<Vec<T>, RispError>
+    where RispType: Into<Result<T, RispError>> {
+    match risp_vec_input {
+        Vector(vector) => {
+            let flat = flatten_vec(vector);
+            flat.iter().cloned()
+                .map(|el| el.into())
+                .collect()
+        }
+        _ => Err(error(format!("Expected Vector but got {:?}", risp_vec_input)))
+    }
+}
+
+pub fn flatten_vec(risp_vec: Vec<RispType>) -> Vec<RispType> {
+    let mut result = vec![];
+    for el in risp_vec {
+        if let RispType::Vector(vector) = el {
+            for child_el in flatten_vec(vector) {
+                result.push(child_el)
+            }
+        } else {
+            result.push(el);
+        }
+    }
+    result
 }
 
 
@@ -138,6 +174,15 @@ fn test_get() {
 }
 
 #[test]
+fn test_get_risptype() {
+    let input_map = map(vec![
+        ("key", Int(23))
+    ]);
+    let int_option: Option<RispType> = input_map.get("key").unwrap();
+    assert_eq!(int_option, Some(Int(23)));
+}
+
+#[test]
 fn test_get_none() {
     let input_map = map(vec![
         ("key", Int(23))
@@ -160,4 +205,41 @@ fn test_get_error_expected_map() {
     let input = Int(123);
     let int_result: Result<Option<i64>, _> = input.get("key");
     assert_eq!(int_result, Err(error(format!("Expected Map but got Int(123)"))));
+}
+
+
+#[test]
+fn test_flatten_vec() {
+    let input = vec![
+        Int(1),
+        Vector(vec![Int(2), Int(3)])
+    ];
+    let flat_result = flatten_vec(input);
+    assert_eq!(flat_result, vec![Int(1), Int(2), Int(3)] );
+}
+
+#[test]
+fn test_flatten_into() {
+    let input = Vector(vec![
+        Int(1),
+        Vector(vec![Int(2), Int(3)])
+    ]);
+    let flat_result = flatten_into(input);
+    assert_eq!(flat_result, Ok(vec![1, 2, 3]));
+}
+
+#[test]
+fn test_flatten_error_outer() {
+    let flat_result: Result<Vec<i64>, _> = flatten_into(Int(1));
+    assert_eq!(flat_result, Err(error("Expected Vector but got Int(1)")));
+}
+
+#[test]
+fn test_flatten_error_inner() {
+    let input = Vector(vec![
+        Int(1),
+        Vector(vec![string("string"), Int(3)])
+    ]);
+    let flat_result: Result<Vec<i64>, _> = flatten_into(input);
+    assert_eq!(flat_result, Err(error("Expected Int but got Str(\"string\")")));
 }
