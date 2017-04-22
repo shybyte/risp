@@ -26,21 +26,23 @@ A rusty lisp inspired by Clojure for usage as simple configuration language
 ## Risp example showing every existing language feature
 
 ```clojure
-  (def myInt 2)
-  
-  (def myVector [1 myInt 3])
-  
-  (def repeated (rep 2 1 2 3))
-  
-  {:added       (+ myInt 20)
-   :multiplied  (* myInt 20)
-   :repeated    repeated
-   :myVector    myVector
-   :myMap       {:key myInt}
-   :myString    "Hello"
-   :myDoResult  (do
-                  (def myInt2 20)
-                  (+ myInt myInt2))}
+(def myInt 2)
+
+(def myVector [1 myInt 3])
+
+(def repeated (rep 2 1 2 3))
+
+{:yes        true
+ :no         false
+ :added      (+ myInt 20)
+ :multiplied (* myInt 20)
+ :repeated   repeated
+ :myVector   myVector
+ :myMap      {:key myInt}
+ :myString   "Hello"
+ :myDoResult (do
+               (def myInt2 20)
+               (+ myInt myInt2))}
 ```            
 
 

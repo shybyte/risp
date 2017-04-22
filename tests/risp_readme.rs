@@ -26,4 +26,8 @@ fn test_kitchen_sink() {
     let mut env = create_core_environment();
     let result = eval_risp_script(&risp_code, &mut env);
     assert!(result.is_ok());
+
+    let result_map = result.unwrap();
+    assert_eq!(result_map.get("yes").unwrap(), Some(true));
+    assert_eq!(result_map.get("no").unwrap(), Some(false));
 }

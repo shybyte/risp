@@ -12,7 +12,11 @@ fn parse_internal(tokenizer: &mut Iterator<Item=Token>) -> Result<RispType, Risp
             }
 
             (TokenType::Symbol, token_string) => {
-                Ok(symbol(token_string))
+                match &token_string[..] {
+                    "true" => Ok(Bool(true)),
+                    "false" => Ok(Bool(false)),
+                    _ => Ok(symbol(token_string))
+                }
             }
 
             (TokenType::Keyword, token_string) => {
@@ -199,4 +203,11 @@ fn test_hash_map_errors() {
 #[test]
 fn test_str() {
     assert_eq!(parse("\"string\""), Ok(string("string")));
+}
+
+
+#[test]
+fn test_bool() {
+    assert_eq!(parse("true"), Ok(Bool(true)));
+    assert_eq!(parse("false"), Ok(Bool(false)));
 }

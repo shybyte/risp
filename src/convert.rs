@@ -11,6 +11,15 @@ impl Into<Result<RispType, RispError>> for RispType {
     }
 }
 
+impl Into<Result<bool, RispError>> for RispType {
+    fn into(self) -> Result<bool, RispError> {
+        match self {
+            Bool(b) => Ok(b),
+            _ => Err(error(format!("Expected Bool but got {:?}", self))),
+        }
+    }
+}
+
 
 impl Into<Result<i64, RispError>> for RispType {
     fn into(self) -> Result<i64, RispError> {
