@@ -26,12 +26,15 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
 ## Risp example showing every existing language feature
 
 ```clojure
+; The risp kitchen sink - yes this line is a single line comment.
+
 (def my_int 2)
 
 (def my_vector [1 my_int 3])
 
-(def repeated (rep 2 1 2 3))
+(def repeated (rep 2 1 2 3)) ; repeat [1 2 3] 2 times => [1 2 3 1 2 3]
 
+; This last expression (it's a map in this case) will be returned.
 {:yes          true
  :no           false
  :added        (+ my_int 20)

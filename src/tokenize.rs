@@ -32,12 +32,14 @@ impl Iterator for Tokenizer {
     type Item = Token;
 
     fn next(&mut self) -> Option<Token> {
+        // Skip white space and comments
+        let comment_regexp = Regex::new("^(\\s+|;.*?(\n|$))+").unwrap();
+        if let Some(cap) = comment_regexp.captures(&self.input[self.pos..]) {
+            self.pos += cap[0].len();
+        }
+
         let input = &self.input[self.pos..];
 
-        // Skip white space
-        let input_trimmed = input.trim_left();
-        self.pos += input.len() - input_trimmed.len();
-        let input = input_trimmed;
 
         if input.starts_with('(') {
             self.pos += 1;
@@ -206,4 +208,11 @@ fn test_string() {
         token(TokenType::Str, "\"string\""),
         token(TokenType::Str, "\"\""),
     ]);
+}
+
+#[test]
+fn test_ignore_single_line_comment() {
+    assert_eq!(tokenize("; comment"), vec![]);
+    assert_eq!(tokenize("; comment\n"), vec![]);
+    assert_eq!(tokenize("; comment\n 23"), vec![token(TokenType::Number, "23")]);
 }
