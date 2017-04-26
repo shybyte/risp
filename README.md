@@ -34,6 +34,11 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
 
 (def repeated (rep 2 1 2 3)) ; repeat [1 2 3] 2 times => [1 2 3 1 2 3]
 
+(comment
+  (this is not evaluated)
+  (it can have multiple lines)
+  (but must have valid risp syntax))
+
 ; This last expression (it's a map in this case) will be returned.
 {:yes          true
  :no           false

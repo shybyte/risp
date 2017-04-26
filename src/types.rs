@@ -9,6 +9,7 @@ pub type RispResult = Result<RispType, RispError>;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum RispType {
+    Nil,
     Bool(bool),
     Int(i64),
     Str(String),

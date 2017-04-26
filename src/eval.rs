@@ -3,6 +3,7 @@ use types::*;
 use types::RispType::*;
 use environment::*;
 use core::create_core_environment;
+use parse;
 
 
 pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
@@ -33,7 +34,10 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                             } else {
                                 error_result("Empty do block")
                             }
-                        }
+                        },
+                        "comment" => {
+                            Ok(Nil)
+                        },
                         _ => {
                             let evaluated_tail = list[1..].iter()
                                 .map(|el| eval(el.clone(), env))
@@ -77,6 +81,12 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
 
 #[allow(dead_code)]
 fn eval_test(ast: RispType) -> RispResult {
+    eval(ast, &mut create_core_environment())
+}
+
+#[allow(dead_code)]
+fn eval_str(risp: &str) -> RispResult {
+    let ast = parse::parse(risp)?;
     eval(ast, &mut create_core_environment())
 }
 
@@ -167,4 +177,11 @@ fn test_eval_nested_map() {
         ("key", Int(3))
     ]);
     assert_eq!(eval_test(input_map.clone()), Ok(expected_output_map));
+}
+
+#[test]
+fn test_ignore_comments() {
+    assert_eq!(eval_str("(comment)"), Ok(Nil));
+    assert_eq!(eval_str("(comment bla)"), Ok(Nil));
+    assert_eq!(eval_str("(comment (bla 1 2))"), Ok(Nil));
 }
