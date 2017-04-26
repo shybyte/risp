@@ -1,6 +1,6 @@
 # Risp [![Build Status](https://travis-ci.org/shybyte/risp.svg?branch=master)](https://travis-ci.org/shybyte/risp) [![codecov](https://codecov.io/gh/shybyte/risp/branch/master/graph/badge.svg)](https://codecov.io/gh/shybyte/risp) [![Crate Version](https://img.shields.io/crates/v/risp.svg)](https://crates.io/crates/risp)
 
-A rusty lisp inspired by Clojure for usage as simple configuration language
+A rusty lisp inspired by Clojure for usage as simple configuration language.
  
 ## Usage in Rust
 
@@ -26,23 +26,23 @@ A rusty lisp inspired by Clojure for usage as simple configuration language
 ## Risp example showing every existing language feature
 
 ```clojure
-(def myInt 2)
+(def my_int 2)
 
-(def myVector [1 myInt 3])
+(def my_vector [1 my_int 3])
 
 (def repeated (rep 2 1 2 3))
 
-{:yes        true
- :no         false
- :added      (+ myInt 20)
- :multiplied (* myInt 20)
- :repeated   repeated
- :myVector   myVector
- :myMap      {:key myInt}
- :myString   "Hello"
- :myDoResult (do
-               (def myInt2 20)
-               (+ myInt myInt2))}
+{:yes          true
+ :no           false
+ :added        (+ my_int 20)
+ :multiplied   (* my_int 20)
+ :repeated     repeated
+ :my_vector    my_vector
+ :my_map       {:key my_int}
+ :my_string    "Hello"
+ :my_do_result (do
+                 (def my_int_2 20)
+                 (+ my_int my_int_2))}
 ```            
 
 
@@ -87,7 +87,7 @@ fn test_convert_to_struct_example() {
 
 ## Goals
 * Simple configuration language
-* Subset of Clojure
+* Subset of Clojure, well... a kind of
 
 ## Secret Real Goal
 * Usable for configuring patches in my pet project [https://github.com/shybyte/rust-midi-patcher](https://github.com/shybyte/rust-midi-patcher) 

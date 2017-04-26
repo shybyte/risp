@@ -1,17 +1,17 @@
-(def myInt 2)
+(def my_int 2)
 
-(def myVector [1 myInt 3])
+(def my_vector [1 my_int 3])
 
 (def repeated (rep 2 1 2 3))
 
-{:yes        true
- :no         false
- :added      (+ myInt 20)
- :multiplied (* myInt 20)
- :repeated   repeated
- :myVector   myVector
- :myMap      {:key myInt}
- :myString   "Hello"
- :myDoResult (do
-               (def myInt2 20)
-               (+ myInt myInt2))}
+{:yes          true
+ :no           false
+ :added        (+ my_int 20)
+ :multiplied   (* my_int 20)
+ :repeated     repeated
+ :my_vector    my_vector
+ :my_map       {:key my_int}
+ :my_string    "Hello"
+ :my_do_result (do
+                 (def my_int_2 20)
+                 (+ my_int my_int_2))}
