@@ -32,7 +32,17 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
 
 (def my_vector [1 my_int 3])
 
-(def repeated (rep 2 1 2 3)) ; repeat [1 2 3] 2 times => [1 2 3 1 2 3]
+; repeat [1 2 3] 2 times => [1 2 3 1 2 3]
+(def repeated (rep 2 1 2 3))
+
+; => [11 21]
+(def vector_sum1 (+ 1 [10 20]))
+
+; => [21 22]
+(def vector_sum2 (+ [1 2] [10 20]))
+
+; => [11 12 21 22] (it wraps!)
+(def vector_sum3 (+ [1 2] [10 10 20 20]))
 
 (comment
   (this is not evaluated)
@@ -44,6 +54,11 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
  :no           false
  :added        (+ my_int 20)
  :multiplied   (* my_int 20)
+ :divided      (* 10 2)
+ :substracted  (- 10 2)
+ :vector_sum1   vector_sum1
+ :vector_sum2   vector_sum2
+ :vector_sum3   vector_sum3
  :repeated     repeated
  :my_vector    my_vector
  :my_map       {:key my_int}

@@ -30,4 +30,7 @@ fn test_kitchen_sink() {
     let result_map = result.unwrap();
     assert_eq!(result_map.get("yes").unwrap(), Some(true));
     assert_eq!(result_map.get("no").unwrap(), Some(false));
+    assert_eq!(result_map.get("vector_sum1").unwrap(), Some(vec![11, 21]));
+    assert_eq!(result_map.get("vector_sum2").unwrap(), Some(vec![11, 22]));
+    assert_eq!(result_map.get("vector_sum3").unwrap(), Some(vec![11, 12, 21, 22]));
 }
