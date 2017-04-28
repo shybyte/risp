@@ -56,9 +56,9 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
  :multiplied   (* my_int 20)
  :divided      (* 10 2)
  :substracted  (- 10 2)
- :vector_sum1   vector_sum1
- :vector_sum2   vector_sum2
- :vector_sum3   vector_sum3
+ :vector_sum1  vector_sum1
+ :vector_sum2  vector_sum2
+ :vector_sum3  vector_sum3
  :repeated     repeated
  :my_vector    my_vector
  :my_map       {:key my_int}
