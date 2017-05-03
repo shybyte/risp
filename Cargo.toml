@@ -1,11 +1,11 @@
 [package]
 name = "risp"
-version = "0.6.0"
+version = "0.6.1"
 description = "A rusty Lisp inspired by Clojure for usage as simple configuration language"
 repository = "https://github.com/shybyte/risp"
 license = "MIT"
 authors = ["shybyte@gmail.com"]
 
 [dependencies]
-regex = "0.2"
-lazy_static = "0.2.x"
+regex = "^0.2"
+lazy_static = "^0.2"
