@@ -5,11 +5,12 @@ extern crate risp;
 
 use test::Bencher;
 
-use std::time::{Duration, Instant};
-
 use risp::eval_risp_script;
 use risp::types::RispType::Int;
 use risp::core::create_core_environment;
+
+use risp::tokenize::tokenize;
+
 
 static RISP_SCRIPT: &str = r#"
 (def chorus_notes
@@ -40,7 +41,19 @@ fn run_eval_risp_script_example() {
     assert_eq!(result, Ok(Int(42)));
 }
 
+
+fn run_tokenize_risp_script_example() {
+    let result = tokenize(RISP_SCRIPT);
+    assert!(result.len() > 0);
+}
+
+#[bench]
+fn bench_tokenize_example(b: &mut Bencher) {
+    b.iter(|| run_tokenize_risp_script_example());
+}
+
 #[bench]
 fn bench_eval_risp_script_example(b: &mut Bencher) {
     b.iter(|| run_eval_risp_script_example());
 }
+

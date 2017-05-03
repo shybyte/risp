@@ -107,7 +107,7 @@ fn token<S: Into<String>>(token_type: TokenType, s: S) -> Token {
 /* ------------------------------ Tests ----------------------------------------------- */
 
 #[allow(dead_code)]
-fn tokenize(input: &str) -> Vec<Token> {
+pub fn tokenize(input: &str) -> Vec<Token> {
     Tokenizer::new(input).collect()
 }
 
