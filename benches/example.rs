@@ -44,16 +44,16 @@ fn run_eval_risp_script_example() {
 
 fn run_tokenize_risp_script_example() {
     let result = tokenize(RISP_SCRIPT);
-    assert!(result.len() > 0);
+    assert!(result.is_empty());
 }
 
 #[bench]
 fn bench_tokenize_example(b: &mut Bencher) {
-    b.iter(|| run_tokenize_risp_script_example());
+    b.iter(run_tokenize_risp_script_example);
 }
 
 #[bench]
 fn bench_eval_risp_script_example(b: &mut Bencher) {
-    b.iter(|| run_eval_risp_script_example());
+    b.iter(run_eval_risp_script_example);
 }
 
