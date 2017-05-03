@@ -8,3 +8,4 @@ authors = ["shybyte@gmail.com"]
 
 [dependencies]
 regex = "0.2"
+lazy_static = "0.2.x"

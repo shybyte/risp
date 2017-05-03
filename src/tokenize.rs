@@ -1,6 +1,5 @@
 use regex::Regex;
 
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum TokenType {
     Number,
@@ -13,6 +12,13 @@ pub enum TokenType {
     Symbol,
     Keyword,
     Str
+}
+
+lazy_static! {
+    static ref COMMENT_REGEXP: Regex = Regex::new("^(\\s+|;.*?(\n|$))+").unwrap();
+    static ref STR_REGEXP: Regex = Regex::new("^\".*?\"").unwrap();
+    static ref SYMBOL_REGEXP: Regex = Regex::new(r"^[^\s\{\}()\[\]]+").unwrap();
+    static ref NUMBER_REGEXP: Regex = Regex::new(r"^-?\d+").unwrap();
 }
 
 pub type Token = (TokenType, String);
@@ -33,8 +39,7 @@ impl Iterator for Tokenizer {
 
     fn next(&mut self) -> Option<Token> {
         // Skip white space and comments
-        let comment_regexp = Regex::new("^(\\s+|;.*?(\n|$))+").unwrap();
-        if let Some(cap) = comment_regexp.captures(&self.input[self.pos..]) {
+        if let Some(cap) = COMMENT_REGEXP.captures(&self.input[self.pos..]) {
             self.pos += cap[0].len();
         }
 
@@ -71,20 +76,17 @@ impl Iterator for Tokenizer {
             return Some(token(TokenType::HashMapEnd, "}"));
         }
 
-        let str_regexp = Regex::new("^\".*?\"").unwrap();
-        if let Some(cap) = str_regexp.captures(input) {
+        if let Some(cap) = STR_REGEXP.captures(input) {
             self.pos += cap[0].len();
             return Some(token(TokenType::Str, cap[0].to_string()))
         }
 
-        let number_regexp = Regex::new(r"^-?\d+").unwrap();
-        if let Some(cap) = number_regexp.captures(input) {
+        if let Some(cap) = NUMBER_REGEXP.captures(input) {
             self.pos += cap[0].len();
             return Some(token(TokenType::Number, cap[0].to_string()))
         }
 
-        let symbol_regexp = Regex::new(r"^[^\s\{\}()\[\]]+").unwrap();
-        if let Some(cap) = symbol_regexp.captures(input) {
+        if let Some(cap) = SYMBOL_REGEXP.captures(input) {
             self.pos += cap[0].len();
             let cap_string = cap[0].to_string();
             if cap_string.starts_with(':') {
@@ -94,10 +96,10 @@ impl Iterator for Tokenizer {
             }
         }
 
-
         None
     }
 }
+
 
 fn token<S: Into<String>>(token_type: TokenType, s: S) -> Token {
     (token_type, s.into())
