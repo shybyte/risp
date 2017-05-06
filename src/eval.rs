@@ -11,8 +11,8 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
         List(list) => {
             let first_element = list.first().ok_or_else(|| error("Empty List"))?;
             match *first_element {
-                Symbol(ref symbol) => {
-                    match symbol.as_ref() {
+                Symbol(ref symbol_ref) => {
+                    match symbol_ref.as_ref() {
                         "def" => {
                             let var = list.get(1).ok_or_else(|| error("Missing variable in def"))?;
                             match *var {
@@ -24,6 +24,12 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                                 }
                                 _ => error_result(format!("Expected symbol in def but got {:?}", var))
                             }
+                        }
+                        "defn" => {
+                            let name = list.get(1).ok_or_else(|| error("Missing function name in defn"))?;
+                            let args = list.get(2).ok_or_else(|| error("Missing args in defn"))?;
+                            let body = list.get(3).ok_or_else(|| error("Missing body in defn"))?;
+                            eval(List(vec![symbol("def"), name.clone(), List(vec![symbol("fn"), args.clone(), body.clone()])]), env)
                         }
                         "do" => {
                             if let Some((last, elements)) = (&list[1..]).split_last() {
@@ -55,7 +61,7 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                             let evaluated_tail = list[1..].iter()
                                 .map(|el| eval(el.clone(), env))
                                 .collect::<Result<Vec<_>, _>>()?;
-                            let env_value = env.get(symbol).ok_or_else(|| error(format!("Undefined symbol{:?}", symbol)))?;
+                            let env_value = env.get(symbol_ref).ok_or_else(|| error(format!("Undefined symbol{:?}", symbol_ref)))?;
                             match env_value {
                                 Function(function) => function(evaluated_tail.to_vec()),
                                 RispFunction(risp_function) => {
@@ -64,14 +70,14 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                                         match *arg {
                                             Symbol(ref arg_string) => {
                                                 inner_env.set(arg_string, value.clone())
-                                            },
+                                            }
                                             _ => {
                                                 return error_result(format!("Expected symbol in args list got {:?}", arg));
                                             }
                                         }
                                     }
                                     eval((*risp_function.body).clone(), &mut inner_env)
-                                },
+                                }
                                 _ => error_result(format!("Expected function but got {:?}", env_value))
                             }
                         }
@@ -281,4 +287,22 @@ fn test_eval_risp_function_does_not_change_surrounding_env() {
         x
     )
     "), Ok(Int(1234)));
+}
+
+
+#[test]
+fn test_eval_defn() {
+    assert_eq!(eval_str(r"
+    (do
+        (defn plus20 [x y] (+ x y 20))
+        (plus20 1 2)
+    )
+    "), Ok(Int(23)));
+}
+
+#[test]
+fn test_eval_defn_errors() {
+    assert_eq!(eval_str("(defn)"), error_result("Missing function name in defn"));
+    assert_eq!(eval_str("(defn name)"), error_result("Missing args in defn"));
+    assert_eq!(eval_str("(defn name [])"), error_result("Missing body in defn"));
 }
