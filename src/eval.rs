@@ -260,6 +260,16 @@ fn test_eval_risp_function_with_args() {
     "), Ok(Int(23)));
 }
 
+#[test]
+fn test_eval_risp_function_with_args_error() {
+    assert_eq!(eval_str(r#"
+    (do
+        (def plus20 (fn ["12" y] (+ x y 20)))
+        (plus20 1 2)
+    )
+    "#), error_result("Expected symbol in args list got Str(\"12\")"));
+}
+
 
 #[test]
 fn test_eval_risp_function_does_not_change_surrounding_env() {
