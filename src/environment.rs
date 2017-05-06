@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use types::*;
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq, Clone)]
 pub struct Environment {
     data: HashMap<String, RispType>,
 }

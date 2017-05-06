@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use std::rc::Rc;
 
 #[derive(Debug, PartialEq)]
 pub struct RispError(String);
@@ -19,6 +20,13 @@ pub enum RispType {
     Keyword(String),
     Symbol(String),
     Function(fn(Vec<RispType>) -> RispResult),
+    RispFunction(RispFunc),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct RispFunc {
+    pub args: Vec<RispType>,
+    pub body: Rc<RispType>
 }
 
 
