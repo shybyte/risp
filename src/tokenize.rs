@@ -218,3 +218,8 @@ fn test_ignore_single_line_comment() {
     assert_eq!(tokenize("; comment\n"), vec![]);
     assert_eq!(tokenize("; comment\n 23"), vec![token(TokenType::Number, "23")]);
 }
+
+#[test]
+fn test_negative_int() {
+    assert_eq!(tokenize("-23"), vec![token(TokenType::Number, "-23")]);
+}
