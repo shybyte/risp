@@ -26,6 +26,7 @@ pub enum RispType {
 #[derive(Debug, PartialEq, Clone)]
 pub struct RispFunc {
     pub args: Vec<RispType>,
+    pub variadic_arg: Option<String>,
     pub body: Rc<RispType>
 }
 
