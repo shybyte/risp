@@ -1,7 +1,8 @@
 extern crate risp;
 
 use risp::eval_risp_script;
-use risp::types::RispType::Int;
+use risp::types::RispType::*;
+use risp::types::*;
 use risp::core::create_core_environment;
 use std::fs::File;
 use std::io::prelude::*;
@@ -25,6 +26,10 @@ fn test_kitchen_sink() {
 
     let mut env = create_core_environment();
     let result = eval_risp_script(&risp_code, &mut env);
+
+    if result.is_err() {
+        println!("Error = {:?}", result);
+    }
     assert!(result.is_ok());
 
     let result_map = result.unwrap();
@@ -33,4 +38,10 @@ fn test_kitchen_sink() {
     assert_eq!(result_map.get("vector_sum1").unwrap(), Some(vec![11, 21]));
     assert_eq!(result_map.get("vector_sum2").unwrap(), Some(vec![11, 22]));
     assert_eq!(result_map.get("vector_sum3").unwrap(), Some(vec![11, 12, 21, 22]));
+    assert_eq!(result_map.get("doubled").unwrap(), Some(Int(42)));
+    assert_eq!(result_map.get("added_20").unwrap(), Some(Int(23)));
+
+    let song: RispType = result_map.get("song").unwrap().unwrap();
+    assert_eq!(song.get("name").unwrap(), Some(string("Sweet Dreams")));
+    assert_eq!(song.get("notes").unwrap(), Some(Vector(vec![Int(1), Int(2), Int(3), Int(4)])));
 }

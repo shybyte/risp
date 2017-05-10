@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use std::rc::Rc;
 
+use environment::Environment;
+
 #[derive(Debug, PartialEq)]
 pub struct RispError(String);
 
@@ -27,7 +29,8 @@ pub enum RispType {
 pub struct RispFunc {
     pub args: Vec<RispType>,
     pub variadic_arg: Option<String>,
-    pub body: Rc<RispType>
+    pub body: Rc<RispType>,
+    pub env: Environment
 }
 
 

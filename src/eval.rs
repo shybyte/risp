@@ -54,7 +54,8 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                                             Ok(RispFunction(RispFunc {
                                                 args: args_vec[..variadic_marker_pos].to_vec(),
                                                 variadic_arg: Some(variadic_arg.to_string()),
-                                                body: Rc::new(body.clone())
+                                                body: Rc::new(body.clone()),
+                                                env: env.clone()
                                             }))
                                         } else {
                                             error_result(format!("Missing variadic arg after & in {:?}", args_vec))
@@ -63,7 +64,8 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                                         Ok(RispFunction(RispFunc {
                                             args: args_vec.clone(),
                                             variadic_arg: None,
-                                            body: Rc::new(body.clone())
+                                            body: Rc::new(body.clone()),
+                                            env: env.clone()
                                         }))
                                     }
                                 }
@@ -78,7 +80,7 @@ pub fn eval(ast: RispType, env: &mut Environment) -> RispResult {
                             match env_value {
                                 Function(function) => function(evaluated_tail.to_vec()),
                                 RispFunction(risp_function) => {
-                                    let mut inner_env = env.clone();
+                                    let mut inner_env = risp_function.env.clone();
                                     put_args_into_env(&risp_function, &evaluated_tail, &mut inner_env)?;
                                     eval((*risp_function.body).clone(), &mut inner_env)
                                 }
@@ -249,13 +251,15 @@ fn test_risp_function_no_args() {
     assert_eq!(eval_str("(fn [] 23)"), Ok(RispFunction(RispFunc {
         args: vec![],
         variadic_arg: None,
-        body: Rc::new(Int(23))
+        body: Rc::new(Int(23)),
+        env: create_core_environment()
     })));
 
     assert_eq!(eval_str("(fn [] (+ 40 2))"), Ok(RispFunction(RispFunc {
         args: vec![],
         variadic_arg: None,
-        body: Rc::new(List(vec![symbol("+"), Int(40), Int(2)]))
+        body: Rc::new(List(vec![symbol("+"), Int(40), Int(2)])),
+        env: create_core_environment()
     })));
 }
 
@@ -358,4 +362,20 @@ fn test_eval_only_variadic_args() {
 #[test]
 fn test_eval_variadic_error() {
     assert_eq!(eval_str("(fn [&] 23)"), error_result("Missing variadic arg after & in [Symbol(\"&\")]"));
+}
+
+
+#[test]
+fn test_return_closures() {
+    assert_eq!(eval_str(r"
+    (do
+        (defn create_adder [x1]
+            (fn [x2] (+ x1 x2)))
+
+        (def add_20 (create_adder 20))
+
+        (add_20 3)
+
+    )
+    "), Ok(Int(23)));
 }
