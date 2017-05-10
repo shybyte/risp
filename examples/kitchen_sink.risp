@@ -48,7 +48,6 @@
  :vector_sum3  vector_sum3
  :repeated     repeated
  :my_vector    my_vector
- :added_20     (add_20 3)
  :my_map       {:key my_int}
  :my_string    "Hello"
  :my_do_result (do

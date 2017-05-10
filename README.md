@@ -49,6 +49,19 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
   (it can have multiple lines)
   (but must have valid risp syntax))
 
+; Define a function
+(defn double [x] (* x 2))
+
+; Function which returns a function (some call it a closure), which adds x1 to its single argument
+(defn create_adder [x1]
+  (fn [x2] (+ x1 x2)))
+
+(def add_20 (create_adder 20))
+
+; variadic function, notes is a vector of all remaining arguments after name
+(defn create_song [name & notes]
+  {:name name :notes notes})
+
 ; This last expression (it's a map in this case) will be returned.
 {:yes          true
  :no           false
@@ -56,6 +69,8 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
  :multiplied   (* my_int 20)
  :divided      (* 10 2)
  :substracted  (- 10 2)
+ :doubled      (double 21)
+ :added_20     (add_20 3)
  :vector_sum1  vector_sum1
  :vector_sum2  vector_sum2
  :vector_sum3  vector_sum3
@@ -65,7 +80,8 @@ A rusty lisp inspired by Clojure for usage as simple configuration language.
  :my_string    "Hello"
  :my_do_result (do
                  (def my_int_2 20)
-                 (+ my_int my_int_2))}
+                 (+ my_int my_int_2))
+ :song         (create_song "Sweet Dreams" 1 2 3 4)}
 ```            
 
 
