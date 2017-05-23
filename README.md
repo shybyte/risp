@@ -135,4 +135,11 @@ fn test_convert_to_struct_example() {
 * Performance
 * Completeness
  
+## License
+
+MIT
+
+## Copyright
+
+Copyright (c) 2017 Marco Stahl
  
